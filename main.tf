@@ -20,8 +20,13 @@ module "security_group" {
 module "beanstalk" {
   source = "./modules/beanstalk"
 
-  vpc_id            = module.vpc.vpc_id
-  private_subnet_id  = module.vpc.private_subnet_ids[0]
+  # ✅ Use VPC module output
+  vpc_id = module.vpc.vpc_id
+
+  # ✅ Use PRIVATE subnets from VPC module (IMPORTANT FIX)
+  private_subnet_ids = module.vpc.private_subnet_ids
+
+  # ✅ Use Security Group module output
   security_group_id = module.security_group.security_group_id
 }
 
@@ -32,7 +37,7 @@ module "rds" {
   source = "./modules/rds"
 
   private_subnet_ids = module.vpc.private_subnet_ids
-  security_group_id = module.security_group.security_group_id
+  security_group_id  = module.security_group.security_group_id
 }
 
 # =========================

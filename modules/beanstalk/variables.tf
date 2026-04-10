@@ -3,9 +3,9 @@ variable "vpc_id" {
   type        = string
 }
 
-variable "private_subnet_id" {
-  description = "Private subnet ID for Beanstalk"
-  type        = string
+variable "private_subnet_ids" {
+  description = "Private subnet IDs for Beanstalk"
+  type        = list(string)
 }
 
 variable "security_group_id" {

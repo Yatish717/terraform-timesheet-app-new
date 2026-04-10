@@ -27,7 +27,7 @@ resource "aws_iam_instance_profile" "eb_instance_profile" {
 }
 
 # -------------------------------
-# SERVICE ROLE (VERY IMPORTANT)
+# SERVICE ROLE
 # -------------------------------
 resource "aws_iam_role" "eb_service_role" {
   name = "timesheet-eb-service-role-v1997"
@@ -50,23 +50,21 @@ resource "aws_iam_role_policy_attachment" "eb_service_policy" {
 }
 
 # -------------------------------
-# ELASTIC BEANSTALK APPLICATION
+# APPLICATION
 # -------------------------------
 resource "aws_elastic_beanstalk_application" "app" {
   name = "timesheet-app-v1997"
 }
 
 # -------------------------------
-# ELASTIC BEANSTALK ENVIRONMENT
+# ENVIRONMENT
 # -------------------------------
 resource "aws_elastic_beanstalk_environment" "env" {
   name                = "timesheet-env-v1997"
   application         = aws_elastic_beanstalk_application.app.name
   solution_stack_name = "64bit Amazon Linux 2023 v4.11.0 running Python 3.11"
 
-  # -------------------------------
   # INSTANCE PROFILE
-  # -------------------------------
   setting {
     namespace = "aws:autoscaling:launchconfiguration"
     name      = "IamInstanceProfile"
@@ -87,38 +85,34 @@ resource "aws_elastic_beanstalk_environment" "env" {
     value     = var.security_group_id
   }
 
-  # -------------------------------
-  # SERVICE ROLE (IMPORTANT)
-  # -------------------------------
+  # SERVICE ROLE
   setting {
     namespace = "aws:elasticbeanstalk:environment"
     name      = "ServiceRole"
     value     = aws_iam_role.eb_service_role.name
   }
 
-  # -------------------------------
-  # SINGLE INSTANCE (NO LOAD BALANCER)
-  # -------------------------------
+  # SINGLE INSTANCE
   setting {
     namespace = "aws:elasticbeanstalk:environment"
     name      = "EnvironmentType"
     value     = "SingleInstance"
   }
 
-  # -------------------------------
-  # VPC CONFIGURATION
-  # -------------------------------
+  
+
+  # VPC
   setting {
     namespace = "aws:ec2:vpc"
     name      = "VPCId"
     value     = var.vpc_id
   }
 
-  # PRIVATE SUBNET
+  # PRIVATE SUBNETS
   setting {
     namespace = "aws:ec2:vpc"
     name      = "Subnets"
-    value     = var.private_subnet_id
+    value     = join(",", var.private_subnet_ids)
   }
 
   # NO PUBLIC IP
@@ -128,9 +122,7 @@ resource "aws_elastic_beanstalk_environment" "env" {
     value     = "false"
   }
 
-  # -------------------------------
   # HEALTH CHECK
-  # -------------------------------
   setting {
     namespace = "aws:elasticbeanstalk:healthreporting:system"
     name      = "SystemType"
