@@ -25,3 +25,16 @@ output "private_subnet_ids" {
 output "security_group_id" {
   value = module.security_group.security_group_id
 }
+
+# ✅ FIXED PART
+output "s3_bucket_name" {
+  value = module.frontend.bucket_name
+}
+
+output "cloudfront_distribution_id" {
+  value = module.frontend.distribution_id
+}
+
+output "cloudfront_url" {
+  value = module.frontend.distribution_domain_name
+}
