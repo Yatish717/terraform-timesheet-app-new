@@ -8,6 +8,11 @@ variable "private_subnet_ids" {
   type        = list(string)
 }
 
+variable "public_subnet_ids" {
+  description = "Public subnet IDs for ALB"
+  type        = list(string)
+}
+
 variable "security_group_id" {
   description = "Security Group ID for Beanstalk"
   type        = string

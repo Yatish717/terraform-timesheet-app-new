@@ -20,13 +20,14 @@ module "security_group" {
 module "beanstalk" {
   source = "./modules/beanstalk"
 
-  # ✅ Use VPC module output
+  # VPC
   vpc_id = module.vpc.vpc_id
 
-  # ✅ Use PRIVATE subnets from VPC module (IMPORTANT FIX)
+  # Subnets
   private_subnet_ids = module.vpc.private_subnet_ids
+  public_subnet_ids  = module.vpc.public_subnet_ids   #  REQUIRED FOR ALB
 
-  # ✅ Use Security Group module output
+  # Security Group
   security_group_id = module.security_group.security_group_id
 }
 

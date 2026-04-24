@@ -60,7 +60,7 @@ resource "aws_elastic_beanstalk_application" "app" {
 # ENVIRONMENT
 # -------------------------------
 resource "aws_elastic_beanstalk_environment" "env" {
-  name                = "timesheet-env-v1997"
+  name                = "timesheet-env-private-v1997"
   application         = aws_elastic_beanstalk_application.app.name
   solution_stack_name = "64bit Amazon Linux 2023 v4.11.0 running Python 3.11"
 
@@ -92,14 +92,39 @@ resource "aws_elastic_beanstalk_environment" "env" {
     value     = aws_iam_role.eb_service_role.name
   }
 
-  # SINGLE INSTANCE
+  # LOAD BALANCED ENVIRONMENT
   setting {
     namespace = "aws:elasticbeanstalk:environment"
     name      = "EnvironmentType"
-    value     = "SingleInstance"
+    value     = "LoadBalanced"
   }
 
-  
+  # ALB TYPE
+  setting {
+    namespace = "aws:elasticbeanstalk:environment"
+    name      = "LoadBalancerType"
+    value     = "application"
+  }
+
+  # INTERNAL LOAD BALANCER (KEY FOR PRIVATE APP)
+  setting {
+    namespace = "aws:ec2:vpc"
+    name      = "ELBScheme"
+    value     = "internal"
+  }
+
+  # AUTOSCALING (DEMO - SINGLE INSTANCE)
+  setting {
+    namespace = "aws:autoscaling:asg"
+    name      = "MinSize"
+    value     = "1"
+  }
+
+  setting {
+    namespace = "aws:autoscaling:asg"
+    name      = "MaxSize"
+    value     = "1"
+  }
 
   # VPC
   setting {
@@ -108,11 +133,18 @@ resource "aws_elastic_beanstalk_environment" "env" {
     value     = var.vpc_id
   }
 
-  # PRIVATE SUBNETS
+  # PRIVATE SUBNETS (EC2 INSTANCES)
   setting {
     namespace = "aws:ec2:vpc"
     name      = "Subnets"
     value     = join(",", var.private_subnet_ids)
+  }
+
+  # PUBLIC SUBNETS (ALB)
+  setting {
+    namespace = "aws:ec2:vpc"
+    name      = "ELBSubnets"
+    value     = join(",", var.public_subnet_ids)
   }
 
   # NO PUBLIC IP
