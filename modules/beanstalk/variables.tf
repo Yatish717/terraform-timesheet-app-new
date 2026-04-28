@@ -17,3 +17,8 @@ variable "security_group_id" {
   description = "Security Group ID for Beanstalk"
   type        = string
 }
+
+variable "alb_security_group_id" {
+  description = "Security Group ID for ALB"
+  type        = string
+}

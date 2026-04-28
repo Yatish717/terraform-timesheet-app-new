@@ -20,6 +20,11 @@ resource "aws_iam_role_policy_attachment" "eb_web_tier" {
   role       = aws_iam_role.eb_instance_role.name
   policy_arn = "arn:aws:iam::aws:policy/AWSElasticBeanstalkWebTier"
 }
+resource "aws_iam_role_policy_attachment" "eb_ssm" {
+  role       = aws_iam_role.eb_instance_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
+}
+
 
 resource "aws_iam_instance_profile" "eb_instance_profile" {
   name = "timesheet-eb-instance-profile-v1997"
@@ -85,6 +90,12 @@ resource "aws_elastic_beanstalk_environment" "env" {
     value     = var.security_group_id
   }
 
+  setting {
+    namespace = "aws:elbv2:loadbalancer"
+    name      = "SecurityGroups"
+    value     = var.alb_security_group_id
+  }
+
   # SERVICE ROLE
   setting {
     namespace = "aws:elasticbeanstalk:environment"
@@ -110,7 +121,7 @@ resource "aws_elastic_beanstalk_environment" "env" {
   setting {
     namespace = "aws:ec2:vpc"
     name      = "ELBScheme"
-    value     = "internal"
+    value     = "public"
   }
 
   # AUTOSCALING (DEMO - SINGLE INSTANCE)

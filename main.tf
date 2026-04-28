@@ -29,6 +29,8 @@ module "beanstalk" {
 
   # Security Group
   security_group_id = module.security_group.security_group_id
+
+  alb_security_group_id = module.security_group.alb_security_group_id
 }
 
 # =========================
